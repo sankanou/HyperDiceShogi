@@ -31,6 +31,7 @@ struct tree
 typedef struct
 {
   unsigned int move;
+  int dice;
 } hist_t;
 
 //gameに，ゲームの全状態を格納しておく。
@@ -284,3 +285,5 @@ int get_turn();
 int get_nply();
 //王手判定
 int is_mated();
+//historyにサイコロの目を追加
+void history_dice( int dice );

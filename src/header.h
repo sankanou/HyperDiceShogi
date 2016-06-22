@@ -15,6 +15,7 @@ extern const char *ch_piece[16];
 extern const char *ch_piece2[32];
 extern const char *ch_piece_csa[16];
 extern FILE *file_log;
+extern unsigned time_total;
 
 /* main.c */
 void close_program();
@@ -29,6 +30,10 @@ void out_legalmoves( unsigned int moves[], int count );
 void str_CSA_move( char *buf, unsigned int move );
 unsigned int  CSA2Internal( const char *str );
 int out_record( int resign );
+int make_randnum( int num );
+int shake_dice();
+int get_dice();
+
 
 /* ini.c */
 void game_initialize();

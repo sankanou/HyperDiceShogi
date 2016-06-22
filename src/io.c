@@ -11,10 +11,9 @@
 
 #define DELIM   " "
 
-static int dice();
-static void manual_move( char **last );
+static void manual_move( char **last, char *dice );
 static void back();
-static void search_start();
+static void search_start( int dice );
 static void new_game();
 
 unsigned time_total = 0;
@@ -26,7 +25,7 @@ int cmd_prompt(){
     */
   char buf[256];
   const char *token;
-  char *last;
+  char *last, *last2;
   int count_byte, ret = 0;
 
   if( TURN )
@@ -47,7 +46,8 @@ int cmd_prompt(){
   buf[count_byte-1] = '\0';
   
   token = strtok_r( buf, DELIM, &last );
-  if( token == NULL )
+  last = strtok_r( last, DELIM, &last2 );
+   if( token == NULL )
     { return 0; }
   
   if( !strcmp( token, "quit" ) )
@@ -57,17 +57,24 @@ int cmd_prompt(){
   else if( !strcmp( token, "back" ) )
     { back(); }
   else if( !strcmp( token, "move" ) )
-    { manual_move( &last ); }
+    { manual_move( &last, last2 ); }
   else if( !strcmp( token, "dice" ) || !strcmp( token, "d" ) )
-    { dice(); }
+    { shake_dice(); }
   else if( !strcmp( token, "search" ) || !strcmp( token, "s" ) )
     {
-      int dice;
-      dice = atoi(last);
-      search_start(dice);
+      if( is_mated() == 1 ) search_start( 0 );
+      else if( last == NULL || strcmp( last, "1" ) < 0 || strcmp( last, "6" ) > 0 )
+	{
+	  out(" Invalid Number\n");
+	  return 1;
+	}
+      else search_start( atoi( last ) );
     }
   else if( !strcmp( token, "ds" ) )
-    { search_start(dice()); }
+    {
+      if( is_mated() == 1 ) search_start( 0 );
+      else search_start( shake_dice() );
+    }
   else if( !strcmp( token, "new" )  )
     { new_game(); }
   else if( !strcmp( token, "record" )  )
@@ -81,14 +88,25 @@ int cmd_prompt(){
   return 0;
 }
 
-static int dice()
+int make_randnum( int num ){
+  time_total += ( unsigned ) time( NULL );
+  srand( time_total );
+  return rand() % num;
+}
+
+int get_dice()
+{
+  time_total += ( unsigned ) time( NULL );
+  srand( time_total );
+  return rand() % DICE_NUM + 1;
+}
+
+int shake_dice()
 {
   int dice, nmove;
   unsigned int moves[ SIZE_LEGALMOVES ];
 
-  time_total += ( unsigned ) time( NULL );
-  srand( time_total );
-  dice = rand() % DICE_NUM + 1;
+  dice = get_dice();
 
   out("\n");
 
@@ -155,7 +173,7 @@ int out_record( int resign )
   /* ret = 0; succeeded
           -1; failed    */
   FILE *fp;
-  int i;
+  int i, dice;
   char str[8], filename[ SIZE_FILENAME];
   struct tm *date;
   time_t timer;
@@ -181,11 +199,13 @@ int out_record( int resign )
   for( i = 0; i < N_PLY; i++ )
     {
       str_CSA_move( str, history[ i ].move );
+      dice = history[ i ].dice;
       if( i % 2 )
         { out_file( fp, "-" ); }
       else
         { out_file( fp, "+" ); }
-      out_file( fp, "%s\n", str );
+      out_file( fp, "%s:", str );
+      out_file( fp, "%d\n", dice );
     }
 
   if( resign )
@@ -206,6 +226,8 @@ static void new_game()
 static void search_start( int dice )
 {
   int iret;
+
+  history_dice( dice );
   iret = search_root( dice );
   if( iret == -3 )
     {
@@ -239,7 +261,7 @@ static void back()
     }
 }
 
-static void manual_move( char **last )
+static void manual_move( char **last, char *dice )
 {
   const char *p = strtok_r( NULL, DELIM, last );
   unsigned int move;
@@ -250,6 +272,16 @@ static void manual_move( char **last )
       out(" Invalid Move\n");
       return;
     }
+
+  if( is_mated() == 1 ) history_dice( 0 );
+  else {
+    if( dice == NULL || strcmp( dice, "1" ) < 0 || strcmp( dice, "6" ) > 0 )
+      {
+	out(" Invalid Number\n");
+	return;
+      }
+    history_dice( atoi( dice ) );
+  }
 
   char str_move[8];
   str_CSA_move( str_move, move );

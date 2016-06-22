@@ -45,7 +45,14 @@ const int Attack_Bishop_shift[32] =
   22, 23, 23, 23, 22
 };
 
-int is_mated(){
+void history_dice( int dice )
+{
+  if( is_mated() == 1 ) history[N_PLY].dice = 0;
+  else history[N_PLY].dice = dice;
+}
+
+int is_mated()
+{
   unsigned int attack_on_king;
   unsigned int att;
 
@@ -56,7 +63,8 @@ int is_mated(){
   return 0;
 }
 
-int gen_dicenum_legalmoves( unsigned int moves[], int dice ){
+int gen_dicenum_legalmoves( unsigned int moves[], int dice )
+{
   /* dice is 1 to 6 */
   int buf_nmove, i, nmove = 0;
   unsigned int buf_moves[ SIZE_LEGALMOVES ];
@@ -77,7 +85,8 @@ int gen_dicenum_legalmoves( unsigned int moves[], int dice ){
     return gen_legalmoves( moves );
 }
 
-int gen_dicelegalmoves( unsigned int moves[][ SIZE_DICE_LEGALMOVES ], int nmove[] ){
+int gen_dicelegalmoves( unsigned int moves[][ SIZE_DICE_LEGALMOVES ], int nmove[] )
+{
   int buf_nmove, i, dice;
   unsigned int buf_moves[ SIZE_LEGALMOVES ];
 
