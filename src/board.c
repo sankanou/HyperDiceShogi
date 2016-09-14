@@ -74,7 +74,7 @@ int gen_dicenum_legalmoves( unsigned int moves[], int dice )
 
   buf_nmove = gen_legalmoves( buf_moves );
   for( i = 0; i < buf_nmove; i++ )
-    if( MOVE_TO( buf_moves[i] ) % 5 == dice - 1 )
+    if( MOVE_TO( buf_moves[i] ) % 5 == 5 - dice )
       {
 	moves[ nmove ] = buf_moves[i];
 	nmove++;
