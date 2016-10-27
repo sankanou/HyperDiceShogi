@@ -180,7 +180,7 @@ int out_record( int resign )
   time( &timer );
   date = localtime( &timer );
   
-  sprintf( filename, "../records/%04d_%02d_%02d_%02d%02d%02d.msk",
+  sprintf( filename, "../records/%04d_%02d_%02d_%02d%02d%02d.dsk",
            date->tm_year +1900, date->tm_mon +1, date->tm_mday,
            date->tm_hour      , date->tm_min,    date->tm_sec);
   
@@ -192,8 +192,8 @@ int out_record( int resign )
       return -1;
     }
 
-  out_file( fp, "\nV1_MSK\n\n" );
-  out_file( fp, "\nPI\n+\n");
+  out_file( fp, "V1-DSK\n\n" );
+  out_file( fp, "\nPI\n");
   
   
   for( i = 0; i < N_PLY; i++ )
