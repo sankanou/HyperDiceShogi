@@ -152,7 +152,7 @@ int not_mated_node( int depth, int ply )
     if( dice_nmove[ dice - 1 ] == 0 )
       dice_max[ dice - 1 ] = max;
       
-  return dice_max[0] / DICE_NUM + dice_max[1] / DICE_NUM + dice_max[2] / DICE_NUM + dice_max[3] / DICE_NUM + dice_max[4] / DICE_NUM + max / DICE_NUM;
+  return ( dice_max[0] + dice_max[1] + dice_max[2] + dice_max[3] + dice_max[4] + max ) / DICE_NUM;
 }
 
 short evaluate()
